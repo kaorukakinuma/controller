@@ -41,8 +41,8 @@ Controller <|. CONTROLLER : <<implements>>
 ## Usage
 
 ```c
-#include "eight_button_controller.h"
-#include "controller.h"
+#include <eight_button_controller.h>
+#include <controller.h>
 
 static const char * const KEYBOARD = "/dev/input/event2";
 
