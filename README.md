@@ -16,6 +16,28 @@ controller.h
 ```
 
 
+## Design
+
+```plantuml
+@startuml
+
+class Controller << (I, yellow) interface >> {
+    + Start()
+    + Stop()
+}
+namespace CONTROLLER {
+    class EightButtonController << (M, orange) >> {
+        + constructor()
+        + destructor()
+    }
+}
+
+Controller <|. CONTROLLER : <<implements>>
+
+@enduml
+```
+
+
 ## Usage
 
 ```c
