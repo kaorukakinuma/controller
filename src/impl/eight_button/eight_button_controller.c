@@ -20,7 +20,7 @@ typedef struct {
     bool                 running;
     pthread_t            thread;
     Keyboard            *pKeyboard;
-    EightButtonConfig    config;
+    ControllerConfig    config;
 } EightButtonController;
 
 /* ------------------------------------------------------------------------- */
@@ -96,7 +96,7 @@ static const Controller sBase = {
 /* ------------------------------------------------------------------------- */
 
 Controller * __new__EightButtonController(
-    const char *pPathname, EightButtonConfig *pConfig )
+    const char *pPathname, ControllerConfig *pConfig )
 {
     if ( pPathname == NULL ) {
         DBGLOG( "Invalid pathname." );

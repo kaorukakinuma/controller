@@ -48,7 +48,7 @@ static const char * const KEYBOARD = "/dev/input/event2";
 
 int main( void )
 {
-    EightButtonConfig config = {
+    ControllerConfig config = {
         .a     = KEY_M,
         .b     = KEY_K,
         .x     = KEY_J,
