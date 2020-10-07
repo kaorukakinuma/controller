@@ -1,6 +1,6 @@
 # Controller
 
-+ Dependencies: `none`
++ Dependencies: `lkeyboard, lpthread`
 + Includes: `controller.h`
 
 
