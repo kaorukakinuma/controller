@@ -5,7 +5,7 @@
 
 int main( void )
 {
-    EightButtonControllerConfig config;
+    EightButtonConfig config;
     Controller *pController;
     pController = __new__EightButtonController( PATH, &config );
     pController->Start( pController );

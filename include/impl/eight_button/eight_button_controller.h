@@ -8,6 +8,7 @@
 #define _EIGHT_BUTTON_CONTROLLER_H_
 
 #include <stdint.h>
+#include <linux/input.h>
 #include "controller_types.h"
 
 typedef struct {
@@ -20,9 +21,9 @@ typedef struct {
     uint8_t left;
     uint8_t up;
     uint8_t down;
-} EightButtonControllerConfig;
+} EightButtonConfig;
 
-Controller * __new__EightButtonController( const char *pPathname, EightButtonControllerConfig *pConfig );
+Controller * __new__EightButtonController( const char *pPathname, EightButtonConfig *pConfig );
 Controller * __del__EightButtonController( Controller *pSelf );
 
 #endif /* _EIGHT_BUTTON_CONTROLLER_H_ */

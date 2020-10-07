@@ -16,11 +16,11 @@
 #include "controller.h"
 
 typedef struct {
-    Controller                     base;
-    bool                           running;
-    pthread_t                      thread;
-    Keyboard                      *pKeyboard;
-    EightButtonControllerConfig    config;
+    Controller           base;
+    bool                 running;
+    pthread_t            thread;
+    Keyboard            *pKeyboard;
+    EightButtonConfig    config;
 } EightButtonController;
 
 /* ------------------------------------------------------------------------- */
@@ -96,7 +96,7 @@ static const Controller sBase = {
 /* ------------------------------------------------------------------------- */
 
 Controller * __new__EightButtonController(
-    const char *pPathname, EightButtonControllerConfig *pConfig )
+    const char *pPathname, EightButtonConfig *pConfig )
 {
     if ( pPathname == NULL ) {
         DBGLOG( "Invalid pathname." );
