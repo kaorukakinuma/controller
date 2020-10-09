@@ -1,7 +1,7 @@
 # Controller
 
-Dependencies: `lkeyboard, lpthread`  
-Includes: `controller.h`
+Dependencies: `lkeyboard` `lcom` `lpthread` `lrt`  
+Includes: `controller.h` `eight_button_controller.h`
 
 
 ## How to Build
@@ -12,7 +12,7 @@ $ sudo ./mk.sh
 $ ls /home/lib
 libcontroller.a
 $ ls /home/include
-controller.h
+controller.h ...
 ```
 
 
@@ -44,11 +44,13 @@ Controller <|. CONTROLLER : <<implements>>
 #include <eight_button_controller.h>
 #include <controller.h>
 
-static const char * const KEYBOARD = "/dev/input/event2";
+static const char * const PATHNAME = "/dev/input/event2";
+static const char * const ADDRESS  = "127.0.0.1";
+static const uint16_t PORT = 0;
 
 int main( void )
 {
-    ControllerConfig config = {
+    EightButtonControllerKeyConfig keyConfig = {
         .a     = KEY_M,
         .b     = KEY_K,
         .x     = KEY_J,
@@ -58,14 +60,22 @@ int main( void )
         .up    = KEY_W,
         .down  = KEY_Z,
     };
+    Com *pCom = __new__SocketComClient( ADDRESS, PORT );
 
-    Controller *pController = __new__EightButtonController( KEYBOARD, &config );
+    EightButtonControllerConfig config = {
+        .pKeyboardPathname = PATHNAME,
+        .pCom              = pCom;
+        .keyConfig         = keyConfig
+    };
+
+    Controller *pController = __new__EightButtonController( &config );
     pController->Start( pController );
 
     // snip
 
     pController->Stop( pController );
     pController = __del__EightButtonController( pController );
+    pCom = __del__SocketComClient( pCom );
 
     return 0;
 }

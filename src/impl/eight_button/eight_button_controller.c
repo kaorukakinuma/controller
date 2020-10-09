@@ -16,11 +16,11 @@
 #include "controller.h"
 
 typedef struct {
-    Controller           base;
-    bool                 running;
-    pthread_t            thread;
-    Keyboard            *pKeyboard;
-    ControllerConfig    config;
+    Controller                        base;
+    bool                              running;
+    pthread_t                         thread;
+    Keyboard                         *pKeyboard;
+    EightButtonControllerKeyConfig    keyConfig;
 } EightButtonController;
 
 /* ------------------------------------------------------------------------- */
@@ -95,11 +95,10 @@ static const Controller sBase = {
 
 /* ------------------------------------------------------------------------- */
 
-Controller * __new__EightButtonController(
-    const char *pPathname, ControllerConfig *pConfig )
+Controller * __new__EightButtonController( EightButtonControllerConfig *pConfig )
 {
-    if ( pPathname == NULL ) {
-        DBGLOG( "Invalid pathname." );
+    if ( pConfig == NULL ) {
+        DBGLOG( "Invalid config." );
         return NULL;
     }
 
@@ -111,7 +110,7 @@ Controller * __new__EightButtonController(
         return NULL;
     }
 
-    Keyboard *pKeyboard = keyboard_Open( pPathname );
+    Keyboard *pKeyboard = keyboard_Open( pConfig->pKeyboardPathname );
     if ( pKeyboard == NULL ) {
         ERRLOG( "Keyboard open failed." );
         free( pSelf );
@@ -122,7 +121,7 @@ Controller * __new__EightButtonController(
     pSelf->base      = sBase;
     pSelf->running   = false;
     pSelf->pKeyboard = pKeyboard;
-    pSelf->config    = *pConfig;
+    pSelf->keyConfig = pConfig->keyConfig;
 
     return (Controller *)pSelf;
 }

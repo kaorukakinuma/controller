@@ -13,7 +13,9 @@ LIBPATH = /home/lib/
 LIBS =\
 	-lcontroller \
 	-lkeyboard \
-	-lpthread
+	-lcom \
+	-lpthread \
+	-lrt
 
 INCPATH = /home/include/
 
