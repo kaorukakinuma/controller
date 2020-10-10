@@ -28,7 +28,8 @@ class Controller << (I, yellow) interface >> {
 namespace CONTROLLER {
     class EightButtonController << (M, orange) >> {
         - Keyboard
-        + constructor()
+        - Com
+        + constructor( config )
         + destructor()
     }
 }
