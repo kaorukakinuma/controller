@@ -27,6 +27,7 @@ class Controller << (I, yellow) interface >> {
 }
 namespace CONTROLLER {
     class EightButtonController << (M, orange) >> {
+        - Keyboard
         + constructor()
         + destructor()
     }
@@ -44,12 +45,16 @@ Controller <|. CONTROLLER : <<implements>>
 #include <eight_button_controller.h>
 #include <controller.h>
 
+#include <socket_com_client.h>
+
 static const char * const PATHNAME = "/dev/input/event2";
 static const char * const ADDRESS  = "127.0.0.1";
 static const uint16_t PORT = 0;
 
 int main( void )
 {
+    Com *pCom = __new__SocketComClient( ADDRESS, PORT );
+
     EightButtonControllerKeyConfig keyConfig = {
         .a     = KEY_M,
         .b     = KEY_K,
@@ -60,20 +65,18 @@ int main( void )
         .up    = KEY_W,
         .down  = KEY_Z,
     };
-    Com *pCom = __new__SocketComClient( ADDRESS, PORT );
-
     EightButtonControllerConfig config = {
         .pKeyboardPathname = PATHNAME,
-        .pCom              = pCom;
+        .pCom              = pCom,
         .keyConfig         = keyConfig
     };
 
     Controller *pController = __new__EightButtonController( &config );
+
     pController->Start( pController );
-
     // snip
-
     pController->Stop( pController );
+
     pController = __del__EightButtonController( pController );
     pCom = __del__SocketComClient( pCom );
 
