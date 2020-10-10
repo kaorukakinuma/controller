@@ -20,6 +20,7 @@ typedef struct {
     bool                              running;
     pthread_t                         thread;
     Keyboard                         *pKeyboard;
+    Com                              *pCom;
     EightButtonControllerKeyConfig    keyConfig;
 } EightButtonController;
 
@@ -121,6 +122,7 @@ Controller * __new__EightButtonController( EightButtonControllerConfig *pConfig 
     pSelf->base      = sBase;
     pSelf->running   = false;
     pSelf->pKeyboard = pKeyboard;
+    pSelf->pCom      = pConfig->pCom;
     pSelf->keyConfig = pConfig->keyConfig;
 
     return (Controller *)pSelf;
