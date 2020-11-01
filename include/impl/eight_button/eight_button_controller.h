@@ -29,8 +29,7 @@
 #include <com.h>
 #include "controller_types.h"
 
-typedef struct {
-/* Values below needs to be those defined in input.h */
+typedef struct __attribute__((packed)) {
     uint8_t a;
     uint8_t b;
     uint8_t x;
@@ -39,12 +38,23 @@ typedef struct {
     uint8_t left;
     uint8_t up;
     uint8_t down;
-} EightButtonControllerKeyConfig;
+} EightButtonControllerKey;
+
+typedef union {
+    /*
+     * 0: Not pressed
+     * 1: Pressed
+     * 2: Long pressed
+     */
+    EightButtonControllerKey field;
+    char aBulk[sizeof(EightButtonControllerKey)];
+} EightButtonControllerData;
 
 typedef struct {
     const char *pKeyboardPathname;
     Com        *pCom;
-    EightButtonControllerKeyConfig keyConfig;
+    /* Values below needs to be those defined in input.h */
+    EightButtonControllerKey keyConfig;
 } EightButtonControllerConfig;
 
 Controller * __new__EightButtonController( EightButtonControllerConfig *pConfig );

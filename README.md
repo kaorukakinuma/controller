@@ -56,7 +56,7 @@ int main( void )
 {
     Com *pCom = __new__SocketComClient( ADDRESS, PORT );
 
-    EightButtonControllerKeyConfig keyConfig = {
+    EightButtonControllerKey keyConfig = {
         .a     = KEY_M,
         .b     = KEY_K,
         .x     = KEY_J,

@@ -21,10 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#define _DEFAULT_SOURCE
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <time.h>
 
 #include <keyboard.h>
 
@@ -33,12 +36,12 @@
 #include "controller.h"
 
 typedef struct {
-    Controller                        base;
-    bool                              running;
-    pthread_t                         thread;
-    Keyboard                         *pKeyboard;
-    Com                              *pCom;
-    EightButtonControllerKeyConfig    keyConfig;
+    Controller                  base;
+    bool                        running;
+    pthread_t                   thread;
+    Keyboard                   *pKeyboard;
+    Com                        *pCom;
+    EightButtonControllerKey    keyConfig;
 } EightButtonController;
 
 /* ------------------------------------------------------------------------- */
@@ -47,9 +50,30 @@ static void * MainThread( void *pArg )
 {
     EightButtonController *pSelf = (EightButtonController *)pArg;
 
-    while ( pSelf->running ) {
+    Keyboard *pKeyboard = pSelf->pKeyboard;
+    Com *pCom = pSelf->pCom;
+    EightButtonControllerKey keyConfig = pSelf->keyConfig;
 
+    pCom->Open( pCom );
+
+    while ( pSelf->running ) {
+        struct timespec delay = { .tv_sec = 0, .tv_nsec = 10*1000*1000 };
+        nanosleep( &delay, NULL );
+
+        EightButtonControllerData data;
+        data.field.a     = keyboard_GetKeyState( pKeyboard, keyConfig.a );
+        data.field.b     = keyboard_GetKeyState( pKeyboard, keyConfig.b );
+        data.field.x     = keyboard_GetKeyState( pKeyboard, keyConfig.x );
+        data.field.y     = keyboard_GetKeyState( pKeyboard, keyConfig.y );
+        data.field.right = keyboard_GetKeyState( pKeyboard, keyConfig.right );
+        data.field.left  = keyboard_GetKeyState( pKeyboard, keyConfig.left );
+        data.field.up    = keyboard_GetKeyState( pKeyboard, keyConfig.up );
+        data.field.down  = keyboard_GetKeyState( pKeyboard, keyConfig.down );
+
+        pCom->Write( pCom, data.aBulk, sizeof(data) );
     }
+
+    pCom->Close( pCom );
 
     pthread_exit( NULL );
 }
@@ -113,10 +137,26 @@ static const Controller sBase = {
 
 /* ------------------------------------------------------------------------- */
 
-Controller * __new__EightButtonController( EightButtonControllerConfig *pConfig )
+static int CheckConfig( EightButtonControllerConfig *pConfig )
 {
     if ( pConfig == NULL ) {
         DBGLOG( "Invalid config." );
+        return -1;
+    }
+    if ( pConfig->pKeyboardPathname == NULL ) {
+        DBGLOG( "Invalid keyboard pathname." );
+        return -1;
+    }
+    if ( pConfig->pCom == NULL ) {
+        DBGLOG( "Invalid com." );
+        return -1;
+    }
+    return 0;
+}
+
+Controller * __new__EightButtonController( EightButtonControllerConfig *pConfig )
+{
+    if ( CheckConfig(pConfig) < 0 ) {
         return NULL;
     }
 
