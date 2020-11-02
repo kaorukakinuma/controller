@@ -47,8 +47,6 @@ Controller <|. CONTROLLER : <<implements>>
 #include <string.h>
 
 #include <mqueue_com.h>
-#include <com.h>
-
 #include <eight_button_controller.h>
 #include <controller.h>
 
@@ -59,20 +57,19 @@ int main( void )
 {
     /* Create instance. */
     Com *pCom = __new__MqueueCom( MQNAME );
-    EightButtonControllerKey keyConfig = {
-        .a     = KEY_M,
-        .b     = KEY_K,
-        .x     = KEY_J,
-        .y     = KEY_I,
-        .right = KEY_S,
-        .left  = KEY_A,
-        .up    = KEY_W,
-        .down  = KEY_Z,
-    };
     EightButtonControllerConfig config = {
         .pKeyboardPathname = KBPATH,
         .pCom              = pCom,
-        .keyConfig         = keyConfig
+        .keyConfig         = {
+            .a     = KEY_M,
+            .b     = KEY_K,
+            .x     = KEY_J,
+            .y     = KEY_I,
+            .right = KEY_S,
+            .left  = KEY_A,
+            .up    = KEY_W,
+            .down  = KEY_Z,
+        },
     };
     Controller *pController = __new__EightButtonController( &config );
 
@@ -83,11 +80,10 @@ int main( void )
         memset( &data, 0, sizeof(data) );
 
         pCom->Read( pCom, data.aBulk, sizeof(data) );
-
         /* Press <A> (KEY_M) to break. */
         if ( data.field.a == 1 ) {
-            printf( "<A> is pressed.\n" );
-            break
+            printf( "\n <A> is pressed.\n" );
+            break;
         };
     }
     pController->Stop( pController );

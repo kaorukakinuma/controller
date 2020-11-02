@@ -5,8 +5,6 @@
 
 #include <socket_com_client.h>
 #include <socket_com_server.h>
-#include <com.h>
-
 #include <eight_button_controller.h>
 #include <controller.h>
 
@@ -23,27 +21,25 @@ static void * StartController( void *pArg )
 {
     Context *pSelf = (Context *)pArg;
 
-    Com *pCom = __new__SocketComServer( PORT );
-    EightButtonControllerKey keyConfig = {
-        .a     = KEY_M,
-        .b     = KEY_K,
-        .x     = KEY_J,
-        .y     = KEY_I,
-        .right = KEY_S,
-        .left  = KEY_A,
-        .up    = KEY_W,
-        .down  = KEY_Z,
-    };
     EightButtonControllerConfig config = {
         .pKeyboardPathname = PATHNAME,
-        .pCom              = pCom,
-        .keyConfig         = keyConfig
+        .pCom              = __new__SocketComServer( PORT ),
+        .keyConfig         = {
+            .a     = KEY_M,
+            .b     = KEY_K,
+            .x     = KEY_J,
+            .y     = KEY_I,
+            .right = KEY_S,
+            .left  = KEY_A,
+            .up    = KEY_W,
+            .down  = KEY_Z,
+        },
     };
     Controller *pController = __new__EightButtonController( &config );
 
     pController->Start( pController );
 
-    pSelf->pCom = pCom;
+    pSelf->pCom = config.pCom;
     pSelf->pController = pController;
 
     pthread_exit( NULL );
