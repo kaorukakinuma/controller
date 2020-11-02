@@ -3,9 +3,10 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#include <socket_com_server.h>
-
 #include <socket_com_client.h>
+#include <socket_com_server.h>
+#include <com.h>
+
 #include <eight_button_controller.h>
 #include <controller.h>
 
@@ -44,6 +45,7 @@ static void * StartController( void *pArg )
 
     pSelf->pCom = pCom;
     pSelf->pController = pController;
+
     pthread_exit( NULL );
 }
 
@@ -70,20 +72,14 @@ int main( void )
     Com *pCom = __new__SocketComClient( ADDRESS, PORT );
     pCom->Open( pCom );
 
-    while ( 1 )
-    {
+    while ( 1 ) {
         EightButtonControllerData data;
         memset( &data, 0, sizeof(data) );
 
         pCom->Read( pCom, data.aBulk, sizeof(data) );
 
+        printf( "\n" );
         int i;
-        int sum = 0;
-        for ( i = 0; i < 8; i++ ) {
-            sum += data.aBulk[i];
-        }
-        if ( sum == 0 ) continue;
-
         for ( i = 0; i < 8; i++ ) {
             printf( "%d ", data.aBulk[i] );
         }

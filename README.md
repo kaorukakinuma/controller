@@ -43,19 +43,22 @@ Controller <|. CONTROLLER : <<implements>>
 ## Usage
 
 ```c
+#include <stdio.h>
+#include <string.h>
+
+#include <mqueue_com.h>
+#include <com.h>
+
 #include <eight_button_controller.h>
 #include <controller.h>
 
-#include <socket_com_client.h>
-
-static const char * const PATHNAME = "/dev/input/event2";
-static const char * const ADDRESS  = "127.0.0.1";
-static const uint16_t PORT = 0;
+static const char * const MQNAME = "/msgqueue";
+static const char * const KBPATH = "/dev/input/event2";
 
 int main( void )
 {
-    Com *pCom = __new__SocketComClient( ADDRESS, PORT );
-
+    /* Create instance. */
+    Com *pCom = __new__MqueueCom( MQNAME );
     EightButtonControllerKey keyConfig = {
         .a     = KEY_M,
         .b     = KEY_K,
@@ -67,19 +70,31 @@ int main( void )
         .down  = KEY_Z,
     };
     EightButtonControllerConfig config = {
-        .pKeyboardPathname = PATHNAME,
+        .pKeyboardPathname = KBPATH,
         .pCom              = pCom,
         .keyConfig         = keyConfig
     };
-
     Controller *pController = __new__EightButtonController( &config );
 
+    /* Receive controller data. */
     pController->Start( pController );
-    // snip
+    while ( 1 ) {
+        EightButtonControllerData data;
+        memset( &data, 0, sizeof(data) );
+
+        pCom->Read( pCom, data.aBulk, sizeof(data) );
+
+        /* Press <A> (KEY_M) to break. */
+        if ( data.field.a == 1 ) {
+            printf( "<A> is pressed.\n" );
+            break
+        };
+    }
     pController->Stop( pController );
 
+    /* Delete instance. */
     pController = __del__EightButtonController( pController );
-    pCom = __del__SocketComClient( pCom );
+    pCom = __del__MqueueCom( pCom );
 
     return 0;
 }

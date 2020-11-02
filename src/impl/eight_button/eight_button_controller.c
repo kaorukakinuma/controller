@@ -46,6 +46,21 @@ typedef struct {
 
 /* ------------------------------------------------------------------------- */
 
+static bool IsDataSame(
+    const EightButtonControllerData *pNewData,
+    const EightButtonControllerData *pOldData )
+{
+    return
+        pNewData->field.a     == pOldData->field.a     &&
+        pNewData->field.b     == pOldData->field.b     &&
+        pNewData->field.x     == pOldData->field.x     &&
+        pNewData->field.y     == pOldData->field.y     &&
+        pNewData->field.right == pOldData->field.right &&
+        pNewData->field.left  == pOldData->field.left  &&
+        pNewData->field.up    == pOldData->field.up    &&
+        pNewData->field.down  == pOldData->field.down;
+}
+
 static void * MainThread( void *pArg )
 {
     EightButtonController *pSelf = (EightButtonController *)pArg;
@@ -57,20 +72,26 @@ static void * MainThread( void *pArg )
     pCom->Open( pCom );
 
     while ( pSelf->running ) {
-        struct timespec delay = { .tv_sec = 0, .tv_nsec = 10*1000*1000 };
+        struct timespec delay = { .tv_sec = 0, .tv_nsec = 1*1000*1000 };
         nanosleep( &delay, NULL );
 
-        EightButtonControllerData data;
-        data.field.a     = keyboard_GetKeyState( pKeyboard, keyConfig.a );
-        data.field.b     = keyboard_GetKeyState( pKeyboard, keyConfig.b );
-        data.field.x     = keyboard_GetKeyState( pKeyboard, keyConfig.x );
-        data.field.y     = keyboard_GetKeyState( pKeyboard, keyConfig.y );
-        data.field.right = keyboard_GetKeyState( pKeyboard, keyConfig.right );
-        data.field.left  = keyboard_GetKeyState( pKeyboard, keyConfig.left );
-        data.field.up    = keyboard_GetKeyState( pKeyboard, keyConfig.up );
-        data.field.down  = keyboard_GetKeyState( pKeyboard, keyConfig.down );
+        EightButtonControllerData newData;
+        newData.field.a     = keyboard_GetKeyState( pKeyboard, keyConfig.a );
+        newData.field.b     = keyboard_GetKeyState( pKeyboard, keyConfig.b );
+        newData.field.x     = keyboard_GetKeyState( pKeyboard, keyConfig.x );
+        newData.field.y     = keyboard_GetKeyState( pKeyboard, keyConfig.y );
+        newData.field.right = keyboard_GetKeyState( pKeyboard, keyConfig.right );
+        newData.field.left  = keyboard_GetKeyState( pKeyboard, keyConfig.left );
+        newData.field.up    = keyboard_GetKeyState( pKeyboard, keyConfig.up );
+        newData.field.down  = keyboard_GetKeyState( pKeyboard, keyConfig.down );
 
-        pCom->Write( pCom, data.aBulk, sizeof(data) );
+        static EightButtonControllerData sOldData = { 0 };
+        if ( IsDataSame(&newData, &sOldData) ) {
+            continue;
+        }
+        sOldData = newData;
+
+        pCom->Write( pCom, newData.aBulk, sizeof(newData) );
     }
 
     pCom->Close( pCom );
