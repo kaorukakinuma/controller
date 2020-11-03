@@ -74,7 +74,6 @@ int main( void )
 
         pCom->Read( pCom, data.aBulk, sizeof(data) );
 
-        printf( "\n" );
         int i;
         for ( i = 0; i < 8; i++ ) {
             printf( "%d ", data.aBulk[i] );

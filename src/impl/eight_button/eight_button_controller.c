@@ -29,6 +29,10 @@
 #include <pthread.h>
 #include <time.h>
 
+/* Terminal i/o settings */
+#include <termios.h>
+#include <unistd.h>
+
 #include <keyboard.h>
 
 #include "eight_button_controller.h"
@@ -45,6 +49,28 @@ typedef struct {
 } EightButtonController;
 
 /* ------------------------------------------------------------------------- */
+
+static void ChangeTermios( struct termios *pOld )
+{
+    tcgetattr( STDIN_FILENO, pOld );
+    struct termios new = *pOld;
+    new.c_lflag &= ~ICANON; //disable buffered i/o
+    new.c_lflag &= ~ECHO;   //set no echo mode
+    tcsetattr( STDIN_FILENO, TCSANOW, &new );
+}
+static void ResetTermios( const struct termios *pOld ) 
+{
+    tcsetattr( STDIN_FILENO, TCSANOW, pOld );
+}
+
+static void ClearStdout( void )
+{
+    size_t size;
+    do {
+        char aBuf[1024];
+        size = fread( &aBuf, 1, 1024, stdout );
+    } while ( size == 1024 );
+}
 
 static bool IsDataSame(
     const EightButtonControllerData *pNewData,
@@ -64,14 +90,16 @@ static bool IsDataSame(
 static void * MainThread( void *pArg )
 {
     EightButtonController *pSelf = (EightButtonController *)pArg;
-
     Keyboard *pKeyboard = pSelf->pKeyboard;
     Com *pCom = pSelf->pCom;
     EightButtonControllerKey keyConfig = pSelf->keyConfig;
 
+    struct termios termios;
+    ChangeTermios( &termios );
     pCom->Open( pCom );
 
     while ( pSelf->running ) {
+
         struct timespec delay = { .tv_sec = 0, .tv_nsec = 1*1000*1000 };
         nanosleep( &delay, NULL );
 
@@ -95,6 +123,8 @@ static void * MainThread( void *pArg )
     }
 
     pCom->Close( pCom );
+    ResetTermios( &termios );
+    ClearStdout();
 
     pthread_exit( NULL );
 }
