@@ -51,8 +51,8 @@ typedef union {
 } EightButtonControllerData;
 
 typedef struct {
-    const char *pKeyboardPathname;
     Com        *pCom;
+    const char *pKeyboardPathname;
     /* Values below needs to be those defined in input.h */
     EightButtonControllerKey keyConfig;
 } EightButtonControllerConfig;

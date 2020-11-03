@@ -43,8 +43,8 @@ typedef struct {
     Controller                  base;
     bool                        running;
     pthread_t                   thread;
-    Keyboard                   *pKeyboard;
     Com                        *pCom;
+    Keyboard                   *pKeyboard;
     EightButtonControllerKey    keyConfig;
 } EightButtonController;
 
@@ -194,12 +194,12 @@ static int CheckConfig( EightButtonControllerConfig *pConfig )
         DBGLOG( "Invalid config." );
         return -1;
     }
-    if ( pConfig->pKeyboardPathname == NULL ) {
-        DBGLOG( "Invalid keyboard pathname." );
-        return -1;
-    }
     if ( pConfig->pCom == NULL ) {
         DBGLOG( "Invalid com." );
+        return -1;
+    }
+    if ( pConfig->pKeyboardPathname == NULL ) {
+        DBGLOG( "Invalid keyboard pathname." );
         return -1;
     }
     return 0;
@@ -229,8 +229,8 @@ Controller * __new__EightButtonController( EightButtonControllerConfig *pConfig 
     /* initialize instance */
     pSelf->base      = sBase;
     pSelf->running   = false;
-    pSelf->pKeyboard = pKeyboard;
     pSelf->pCom      = pConfig->pCom;
+    pSelf->pKeyboard = pKeyboard;
     pSelf->keyConfig = pConfig->keyConfig;
 
     return (Controller *)pSelf;

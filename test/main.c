@@ -22,8 +22,8 @@ static void * StartController( void *pArg )
     Context *pSelf = (Context *)pArg;
 
     EightButtonControllerConfig config = {
-        .pKeyboardPathname = PATHNAME,
         .pCom              = __new__SocketComServer( PORT ),
+        .pKeyboardPathname = PATHNAME,
         .keyConfig         = {
             .a     = KEY_M,
             .b     = KEY_K,

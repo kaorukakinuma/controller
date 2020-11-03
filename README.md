@@ -58,8 +58,8 @@ int main( void )
     /* Create instance. */
     Com *pCom = __new__MqueueCom( MQNAME );
     EightButtonControllerConfig config = {
-        .pKeyboardPathname = KBPATH,
         .pCom              = pCom,
+        .pKeyboardPathname = KBPATH,
         .keyConfig         = {
             .a     = KEY_M,
             .b     = KEY_K,
